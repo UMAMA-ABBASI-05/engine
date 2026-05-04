@@ -53,6 +53,33 @@ class ApiService {
     }
   }
 
+  Future<bool> deleteServer(int serverId) async {
+    final res = await http.delete(
+      Uri.parse('$baseUrl/server/delete-server/$serverId'),
+    );
+    return res.statusCode == 200;
+  }
+
+  Future<bool> updateServer(
+    int serverId, {
+    required String name,
+    required String ip,
+    required int port,
+    required String protocol,
+  }) async {
+    final res = await http.put(
+      Uri.parse('$baseUrl/server/update-server/$serverId'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'name': name,
+        'ip': ip,
+        'port': port,
+        'protocol': protocol,
+      }),
+    );
+    return res.statusCode == 200;
+  }
+
   // ==================== ENDPOINTS ====================
 
   Future<List<Endpoint>> getEndpointsForServer(int serverId) async {
@@ -163,33 +190,6 @@ class ApiService {
       Uri.parse('$baseUrl/route/delete-route/$routeId'),
     );
     return res.statusCode == 204;
-  }
-
-  Future<bool> deleteServer(int serverId) async {
-    final res = await http.delete(
-      Uri.parse('$baseUrl/server/delete-server/$serverId'),
-    );
-    return res.statusCode == 200;
-  }
-
-  Future<bool> updateServer(
-    int serverId, {
-    required String name,
-    required String ip,
-    required int port,
-    required String protocol,
-  }) async {
-    final res = await http.put(
-      Uri.parse('$baseUrl/server/update-server/$serverId'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'name': name,
-        'ip': ip,
-        'port': port,
-        'protocol': protocol,
-      }),
-    );
-    return res.statusCode == 200;
   }
 
   Future<List<dynamic>> fetchMappingRules(int routeId) async {
