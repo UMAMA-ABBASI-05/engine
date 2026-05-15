@@ -24,6 +24,7 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
   Future<void> fetchAllRoutes() async {
     try {
       final data = await _apiService.fetchAllRoutes();
+      print("Routes fetched: $data"); // ← debug
       setState(() {
         allRoutes = data;
         isLoading = false;
@@ -89,35 +90,58 @@ class _ChannelsScreenState extends State<ChannelsScreen> {
                     child: CircularProgressIndicator(color: Color(0xFF1A365D)),
                   ),
                 )
+              else if (allRoutes.isEmpty)
+                const Expanded(
+                  child: Center(
+                    child: Text(
+                      'No channels found',
+                      style: TextStyle(color: Colors.grey),
+                    ),
+                  ),
+                )
               else
                 Expanded(
-                  child: ListView.separated(
-                    itemCount: allRoutes.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (context, index) {
-                      final route = allRoutes[index];
+                  child: RefreshIndicator(
+                    onRefresh: fetchAllRoutes,
+                    child: ListView.separated(
+                      itemCount: allRoutes.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 12),
+                      itemBuilder: (context, index) {
+                        final route = allRoutes[index];
+                        print("Route[$index]: $route"); // ← debug
 
-                      // FIX: Aapke SQL table mein column 'name' hai
-                      String channelNameFromDB =
-                          route['channel_name']?.toString() ??
-                          "Unnamed Channel";
+                        // Null safe ID
+                        final routeId =
+                            route['route_id'] as int? ??
+                            route['id'] as int? ??
+                            0;
 
-                      return _ChannelCard(
-                        channelName: channelNameFromDB,
-                        sourceName: route['src_server']?['name'] ?? 'N/A',
-                        destName: route['dest_server']?['name'] ?? 'N/A',
-                        onView: () =>
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    ChannelDetailsScreen(channel: route),
-                              ),
-                            ).then((deleted) {
-                              if (deleted == true) fetchAllRoutes();
-                            }),
-                      );
-                    },
+                        String channelNameFromDB =
+                            route['channel_name']?.toString() ??
+                            route['name']?.toString() ??
+                            "Unnamed Channel";
+
+                        return _ChannelCard(
+                          channelName: channelNameFromDB,
+                          sourceName: route['src_server']?['name'] ?? 'N/A',
+                          destName: route['dest_server']?['name'] ?? 'N/A',
+                          onView: () =>
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => ChannelDetailsScreen(
+                                    channel: {
+                                      ...route,
+                                      'route_id': routeId, // ← safe pass
+                                    },
+                                  ),
+                                ),
+                              ).then((deleted) {
+                                if (deleted == true) fetchAllRoutes();
+                              }),
+                        );
+                      },
+                    ),
                   ),
                 ),
             ],

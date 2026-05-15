@@ -1,7 +1,9 @@
+import 'package:engine/screens/message_logs.dart';
 import 'package:flutter/material.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/add_endpoint_screen.dart';
 import 'screens/channel_screen.dart';
+import 'screens/login_screen.dart';
 import 'core/constants.dart';
 
 void main() {
@@ -18,10 +20,11 @@ class HealthEngineApp extends StatelessWidget {
       title: 'Health FHIR Engine',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: AppConstants.primaryBlue),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: AppConstants.primaryBlue),
         scaffoldBackgroundColor: AppConstants.backgroundGrey,
       ),
-      home: const MainNavigationHolder(),
+      home: const LoginScreen(), // ← hamesha login
     );
   }
 }
@@ -30,22 +33,22 @@ class MainNavigationHolder extends StatefulWidget {
   const MainNavigationHolder({super.key});
 
   @override
-  State<MainNavigationHolder> createState() => _MainNavigationHolderState();
+  State<MainNavigationHolder> createState() =>
+      _MainNavigationHolderState();
 }
 
 class _MainNavigationHolderState extends State<MainNavigationHolder> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
-    DashboardScreen(), // index 0
-    AddEndpointScreen(), // index 1
-    ChannelsScreen(), // index 2
+    DashboardScreen(),
+    AddEndpointScreen(),
+    ChannelsScreen(),
+    MessageLogsScreen(),
   ];
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    setState(() => _selectedIndex = index);
   }
 
   @override
@@ -73,6 +76,11 @@ class _MainNavigationHolderState extends State<MainNavigationHolder> {
             icon: Icon(Icons.settings_input_component_outlined),
             activeIcon: Icon(Icons.settings_input_component),
             label: "Channels",
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.receipt_long_outlined),
+            activeIcon: Icon(Icons.receipt_long),
+            label: "Logs",
           ),
         ],
       ),

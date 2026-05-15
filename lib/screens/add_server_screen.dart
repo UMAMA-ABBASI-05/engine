@@ -15,8 +15,11 @@ class _AddServerScreenState extends State<AddServerScreen> {
   final TextEditingController _ipController = TextEditingController();
   final TextEditingController _portController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _systemIpController = TextEditingController();
+  //final TextEditingController _categoryController = TextEditingController();
 
   String _selectedProtocol = 'FHIR';
+  String _selectedCategory = 'EHR';
   bool _isLoading = false;
 
   void _submitData() async {
@@ -24,10 +27,13 @@ class _AddServerScreenState extends State<AddServerScreen> {
       setState(() => _isLoading = true);
 
       final serverData = {
+        "system_ip": _systemIpController.text,
+        // "server_ip": _ipController.text,
         "name": _nameController.text,
         "ip": _ipController.text,
         "port": int.parse(_portController.text),
         "protocol": _selectedProtocol,
+        "category": _selectedCategory,
       };
 
       try {
@@ -72,6 +78,9 @@ class _AddServerScreenState extends State<AddServerScreen> {
                 const SizedBox(height: 32),
 
                 // ── Server IP ───────────────────────────────────────────
+                _label("System IP"),
+                _buildField(_systemIpController, "Enter System IP"),
+
                 _label("Server IP"),
                 _buildField(_ipController, "Enter Server IP"),
 
@@ -112,6 +121,37 @@ class _AddServerScreenState extends State<AddServerScreen> {
                           .toList(),
                       onChanged: (value) =>
                           setState(() => _selectedProtocol = value!),
+                    ),
+                  ),
+                ),
+                _label("Category"),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: const Color(0xFFE0E0E0)),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: _selectedCategory,
+                      isExpanded: true,
+                      icon: const Icon(
+                        Icons.keyboard_arrow_down,
+                        color: Color(0xFF888888),
+                      ),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF333333),
+                      ),
+                      items: ['EHR', 'LIS', 'Payer', 'PHR']
+                          .map(
+                            (val) =>
+                                DropdownMenuItem(value: val, child: Text(val)),
+                          )
+                          .toList(),
+                      onChanged: (value) =>
+                          setState(() => _selectedCategory = value!),
                     ),
                   ),
                 ),

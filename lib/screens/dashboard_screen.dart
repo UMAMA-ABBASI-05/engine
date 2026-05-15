@@ -80,7 +80,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     label: const Text(
                       "Add Server",
                       style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.w600),
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF1A365D),
@@ -88,7 +90,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                       elevation: 0,
                     ),
                   ),
@@ -107,33 +111,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   Widget _buildStatsCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF3B6FF0).withOpacity(0.3)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+    return FutureBuilder<List<Server>>(
+      future: _serversFuture,
+      builder: (context, snapshot) {
+        final count = snapshot.data?.length ?? 0;
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFF3B6FF0).withOpacity(0.3)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 3),
+              ),
+            ],
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _statText("Total Servers Connected: ", "4"),
-          const Divider(height: 20, color: Color(0xFFEEEEEE)),
-          _statText("Today's Message Received: ", "10"),
-          const SizedBox(height: 8),
-          _statText("Today's Message Sent: ", "10"),
-          const SizedBox(height: 8),
-          _statText("Today's Error: ", "0", isError: true),
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _statText("Total Servers Connected: ", "$count"), // ← dynamic
+              const Divider(height: 20, color: Color(0xFFEEEEEE)),
+              _statText("Today's Message Received: ", "10"),
+              const SizedBox(height: 8),
+              _statText("Today's Message Sent: ", "10"),
+              const SizedBox(height: 8),
+              _statText("Today's Error: ", "0", isError: true),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -183,23 +193,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 const Icon(Icons.error_outline, color: Colors.red, size: 48),
                 const SizedBox(height: 16),
-                Text('Error loading servers',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red[700])),
+                Text(
+                  'Error loading servers',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.red[700],
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text(snapshot.error.toString(),
-                    style:
-                        TextStyle(fontSize: 12, color: Colors.grey[600]),
-                    textAlign: TextAlign.center),
+                Text(
+                  snapshot.error.toString(),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+                  textAlign: TextAlign.center,
+                ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: _refreshServers,
                   icon: const Icon(Icons.refresh),
                   label: const Text('Retry'),
                   style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF1A365D)),
+                    backgroundColor: const Color(0xFF1A365D),
+                  ),
                 ),
               ],
             ),
@@ -218,109 +233,104 @@ class _DashboardScreenState extends State<DashboardScreen> {
               children: [
                 Icon(Icons.dns_outlined, color: Colors.grey[400], size: 48),
                 const SizedBox(height: 16),
-                Text('No Servers Found',
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.grey[700])),
+                Text(
+                  'No Servers Found',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey[700],
+                  ),
+                ),
                 const SizedBox(height: 8),
-                Text('Add your first server to get started',
-                    style:
-                        TextStyle(fontSize: 12, color: Colors.grey[500])),
+                Text(
+                  'Add your first server to get started',
+                  style: TextStyle(fontSize: 12, color: Colors.grey[500]),
+                ),
               ],
             ),
           );
         }
 
-        // ── Data Table ──────────────────────────────────────────────
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFE8E8E8)),
-          ),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: DataTable(
-              headingRowColor:
-                  WidgetStateProperty.all(const Color(0xFFF8F8F8)),
-              headingRowHeight: 50,
-              dataRowHeight: 58,
-              dividerThickness: 1,
-              columns: const [
-                DataColumn(
-                  label: Text('Server Name',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          color: Color(0xFF1A365D))),
-                ),
-                DataColumn(
-                  label: Text('Protocol',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          color: Color(0xFF1A365D))),
-                ),
-                DataColumn(
-                  label: Text('status',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          color: Color(0xFF1A365D))),
-                ),
-                DataColumn(
-                  label: Text('View Details',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
-                          color: Color(0xFF1A365D))),
-                ),
-              ],
-              rows: snapshot.data!
-                  .map((server) => DataRow(cells: [
-                        DataCell(Text(server.name,
-                            style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w500))),
-                        DataCell(Text(server.protocol,
-                            style: const TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF1A365D),
-                                fontWeight: FontWeight.w600))),
-                        DataCell(Text(
+        return ListView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: snapshot.data!.length,
+          itemBuilder: (context, index) {
+            final server = snapshot.data![index];
+            return Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE8E8E8)),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          server.name,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF1A365D),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Protocol: ${server.protocol}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.black54,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
                           server.status,
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: server.status == "Active"
+                            color: server.status == 'Active'
                                 ? Colors.green.shade700
                                 : Colors.red.shade700,
                           ),
-                        )),
-                        DataCell(
-                          InkWell(
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (c) => ServerDetailsScreen(
-                                    serverId: server.serverId),
-                              ),
-                            ),
-                            child: const Text(
-                              "View >",
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF1A365D),
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            ServerDetailsScreen(serverId: server.serverId),
+                      ),
+                    ).then((_) => _refreshServers()),
+                    child: const Row(
+                      children: [
+                        Text(
+                          'View',
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF1A365D),
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ]))
-                  .toList(),
-            ),
-          ),
+                        Icon(
+                          Icons.chevron_right,
+                          color: Color(0xFF1A365D),
+                          size: 20,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
     );

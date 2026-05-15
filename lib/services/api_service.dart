@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:engine/models/message_logs_model.dart';
 import 'package:http/http.dart' as http;
 import '../models/server_model.dart';
 import '../models/endpoint_model.dart';
@@ -8,7 +9,29 @@ import '../core/constants.dart';
 
 class ApiService {
   final String baseUrl = AppConstants.baseUrl;
+  // Login
+  Future<Map<String, dynamic>> login(String email, String password) async {
+    final res = await http.post(
+      Uri.parse('$baseUrl/user/login'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
+    );
+    final data = jsonDecode(res.body);
+    if (res.statusCode == 201) return data;
+    throw Exception(data['detail'] ?? 'Login failed');
+  }
 
+  // Signup
+  Future<Map<String, dynamic>> signup(String email, String password) async {
+    final res = await http.post(
+      Uri.parse('$baseUrl/user/sign-up'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email, 'password': password}),
+    );
+    final data = jsonDecode(res.body);
+    if (res.statusCode == 200 || res.statusCode == 201) return data;
+    throw Exception(data['detail'] ?? 'Signup failed');
+  }
   // ==================== SERVERS ====================
 
   Future<List<Server>> fetchAllServers() async {
@@ -176,7 +199,7 @@ class ApiService {
     try {
       final response = await http.get(Uri.parse('$baseUrl/route/all-routes'));
       if (response.statusCode == 200) {
-        return json.decode(response.body);
+        return json.decode(response.body); // ← seedha list return karo
       } else {
         throw Exception('Routes load nahi ho sakay');
       }
@@ -305,97 +328,27 @@ class ApiService {
 
   Future<List<dynamic>> fetchAllLogs() async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/logs'));
+      final response = await http.get(Uri.parse('$baseUrl/logs/show-logs'));
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Logs load nahi ho sakay');
+        throw Exception('Logs not load');
       }
     } catch (e) {
       throw Exception('Error: $e');
     }
   }
 
-  Future<List<dynamic>> fetchErrorLogs() async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/logs/errors'));
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
-      } else {
-        throw Exception('Error logs load nahi ho sakay');
-      }
-    } catch (e) {
-      throw Exception('Error: $e');
-    }
-  }
-
-  Future<List<dynamic>> fetchServerLogs(int serverId) async {
+  // List nahi, Map return karo:
+  Future<Map<String, dynamic>> fetchLogMessage(int logId) async {
     try {
       final response = await http.get(
-        Uri.parse('$baseUrl/logs/server/$serverId'),
+        Uri.parse('$baseUrl/logs/show-log-msg/$logId'),
       );
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {
-        throw Exception('Server logs load nahi ho sakay');
-      }
-    } catch (e) {
-      throw Exception('Error: $e');
-    }
-  }
-
-  Future<List<dynamic>> fetchLogsByDate(String date) async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/logs/date/$date'));
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
-      } else {
-        throw Exception('Date logs load nahi ho sakay');
-      }
-    } catch (e) {
-      throw Exception('Error: $e');
-    }
-  }
-
-  // ==================== MESSAGES ====================
-
-  Future<Map<String, dynamic>> getMessage({
-    int? serverId,
-    int? endpointId,
-  }) async {
-    try {
-      String url = '$baseUrl/messages';
-      if (serverId != null) url += '?server_id=$serverId';
-      if (endpointId != null) {
-        url += (serverId != null ? '&' : '?') + 'endpoint_id=$endpointId';
-      }
-
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
-      } else {
-        throw Exception('Message load nahi ho saka');
-      }
-    } catch (e) {
-      throw Exception('Error: $e');
-    }
-  }
-
-  Future<List<dynamic>> getMessageHistory({
-    int? serverId,
-    int? channelId,
-    int limit = 50,
-  }) async {
-    try {
-      String url = '$baseUrl/messages/history?limit=$limit';
-      if (serverId != null) url += '&server_id=$serverId';
-      if (channelId != null) url += '&channel_id=$channelId';
-
-      final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        return json.decode(response.body);
-      } else {
-        throw Exception('Message history load nahi ho saka');
+        throw Exception('message not load');
       }
     } catch (e) {
       throw Exception('Error: $e');

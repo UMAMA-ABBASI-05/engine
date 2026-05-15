@@ -48,15 +48,15 @@ class _ServerDetailsScreenState extends State<ServerDetailsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 _dialogField(nameCtrl, 'Server Name'),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 _dialogField(ipCtrl, 'IP Address'),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 _dialogField(
                   portCtrl,
                   'Port',
                   keyboardType: TextInputType.number,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 DropdownButtonFormField<String>(
                   value: protocol,
                   decoration: InputDecoration(
@@ -209,50 +209,63 @@ class _ServerDetailsScreenState extends State<ServerDetailsScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Server Details",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1A365D),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-                  _infoField("Server Name", server.name),
-                  _infoField("Protocol", server.protocol),
-                  _buildLabel("Status"),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 14,
-                    ),
-                    decoration: BoxDecoration(
-                      color: server.status == "Active"
-                          ? Colors.green.shade50
-                          : Colors.red.shade50,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(
-                        color: server.status == "Active"
-                            ? Colors.green.shade200
-                            : Colors.red.shade200,
+                  // Scrollable content
+                  Expanded(
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Server Details",
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFF1A365D),
+                            ),
+                          ),
+                          const SizedBox(height: 28),
+                          _infoField("Server Name", server.name),
+                          _infoField("Protocol", server.protocol),
+                          _buildLabel("Status"),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 14,
+                            ),
+                            decoration: BoxDecoration(
+                              color: server.status == "Active"
+                                  ? Colors.green.shade50
+                                  : Colors.red.shade50,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(
+                                color: server.status == "Active"
+                                    ? Colors.green.shade200
+                                    : Colors.red.shade200,
+                              ),
+                            ),
+                            child: Text(
+                              server.status,
+                              style: TextStyle(
+                                color: server.status == "Active"
+                                    ? Colors.green.shade700
+                                    : Colors.red.shade700,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          _infoField("IP", server.ip),
+                          _infoField("Port", server.port.toString()),
+                          _infoField("Category", server.category),
+                          const SizedBox(height: 20),
+                        ],
                       ),
                     ),
-                    child: Text(
-                      server.status,
-                      style: TextStyle(
-                        color: server.status == "Active"
-                            ? Colors.green.shade700
-                            : Colors.red.shade700,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                      ),
-                    ),
                   ),
-                  const SizedBox(height: 20),
-                  _infoField("IP", server.ip),
-                  _infoField("Port", server.port.toString()),
-                  const Spacer(),
+
+                  // Buttons — always at bottom
                   Row(
                     children: [
                       Expanded(
