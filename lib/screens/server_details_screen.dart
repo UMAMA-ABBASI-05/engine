@@ -259,6 +259,7 @@ class _ServerDetailsScreenState extends State<ServerDetailsScreen> {
                           _infoField("IP", server.ip),
                           _infoField("Port", server.port.toString()),
                           _infoField("Category", server.category),
+                          _infoField("System ID", server.systemId),
                           const SizedBox(height: 20),
                         ],
                       ),

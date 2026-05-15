@@ -15,7 +15,7 @@ class _AddServerScreenState extends State<AddServerScreen> {
   final TextEditingController _ipController = TextEditingController();
   final TextEditingController _portController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _systemIpController = TextEditingController();
+  final TextEditingController _systemIdController = TextEditingController();
   //final TextEditingController _categoryController = TextEditingController();
 
   String _selectedProtocol = 'FHIR';
@@ -27,8 +27,8 @@ class _AddServerScreenState extends State<AddServerScreen> {
       setState(() => _isLoading = true);
 
       final serverData = {
-        "system_ip": _systemIpController.text,
-        // "server_ip": _ipController.text,
+        "system_id": _systemIdController.text,
+        "server_ip": _ipController.text,
         "name": _nameController.text,
         "ip": _ipController.text,
         "port": int.parse(_portController.text),
@@ -78,8 +78,8 @@ class _AddServerScreenState extends State<AddServerScreen> {
                 const SizedBox(height: 32),
 
                 // ── Server IP ───────────────────────────────────────────
-                _label("System IP"),
-                _buildField(_systemIpController, "Enter System IP"),
+                _label("System ID"),
+                _buildField(_systemIdController, "Enter System ID"),
 
                 _label("Server IP"),
                 _buildField(_ipController, "Enter Server IP"),
