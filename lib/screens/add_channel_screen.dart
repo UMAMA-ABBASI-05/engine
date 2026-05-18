@@ -32,7 +32,14 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
   Set<int> selectedDestinationFieldIds = {};
   List<Map<String, dynamic>> finalMappings = [];
 
-  final List<String> messageTypes = ["ADT", "ORM", "ORU", "DFT"];
+  final List<Map<String, String>> messageTypes = [
+    {'value': 'ADT^A04', 'display': 'ADT^A04 (Patient Registration)'},
+    {'value': 'ADT^A01', 'display': 'ADT^A01 (Add Encounter)'},
+    {'value': 'DFT^P03', 'display': 'DFT^P03 (Send Claim Submission)'},
+    {'value': 'ORM^O01', 'display': 'ORM^O01 (Send Lab Test Order)'},
+    {'value': 'ORU^R01', 'display': 'ORU^R01 (Send Report/Results)'},
+    {'value': 'BAR^P10', 'display': 'BAR^P10 (Claim Approval/Rejection)'},
+  ];
   String? selectedMessageType;
 
   bool isLoading = true;
@@ -114,14 +121,27 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
 
   // --- Mapping & Database Submit Logic ---
   Future<void> addMapping() async {
-    if (selectedSourceFieldIds.isEmpty || selectedDestinationFieldIds.isEmpty) {
+    // Duplicate check
+    final srcIds = selectedSourceFieldIds.toList()..sort();
+    final destIds = selectedDestinationFieldIds.toList()..sort();
+
+    final isDuplicate = finalMappings.any((m) {
+      final mSrc = (m['src_paths'] as List)..sort();
+      final mDest = (m['dest_paths'] as List)..sort();
+      return mSrc.toString() == srcIds.toString() &&
+          mDest.toString() == destIds.toString();
+    });
+
+    if (isDuplicate) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Please select source and destination fields"),
+          content: Text('This mapping already exists!'),
+          backgroundColor: Colors.orange,
         ),
       );
       return;
     }
+    // ... baaki code same
 
     final srcNames = _allSourceFields
         .where((f) => selectedSourceFieldIds.contains(f.endpointFieldId))
@@ -226,7 +246,7 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
                   children: [
                     const Text(
                       "Add Channels",
-                      
+
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
@@ -449,7 +469,10 @@ class _AddChannelScreenState extends State<AddChannelScreen> {
                         hint: const Text("Select Message Type"),
                         items: messageTypes
                             .map(
-                              (m) => DropdownMenuItem(value: m, child: Text(m)),
+                              (m) => DropdownMenuItem(
+                                value: m['value'],
+                                child: Text(m['display']!),
+                              ),
                             )
                             .toList(),
                         onChanged: (val) =>
